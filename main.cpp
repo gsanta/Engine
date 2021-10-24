@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp> // glm::value_ptr
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
+#include "src/ShaderProgram.h"
 
 // Shader sources
 const GLchar* vertexSource =
@@ -74,10 +75,12 @@ int main()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
+    ShaderProgram shaderProgram2(vertexSource, fragmentSource, 1);
+
     // Create a Vertex Buffer Object and copy the vertex data to it
-    glGenBuffers(1, &vbo);
     setupVertices();
 
+    glGenBuffers(1, &vbo);
     // GLfloat vertices[] = {0.25f, -0.25f, 0.0f, -0.25f, -0.25f, 0.0f, 0.25f, 0.25f, 0.0f};
 
     // glBindBuffer(GL_ARRAY_BUFFER, vbo);
