@@ -9,6 +9,9 @@
 #include <glm/gtc/type_ptr.hpp> // glm::value_ptr
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include "src/ShaderProgram.h"
+#include "src/Camera.h"
+#include "src/shapes/Cube.h"
+#include "src/rendering/Renderer.h"
 
 // Shader sources
 const GLchar* vertexSource =
@@ -37,12 +40,11 @@ std::function<void()> loop;
 void main_loop() { loop(); }
 
 GLuint vbo;
-glm::mat4 pMat, vMat, mMat, mvMat;
+glm::mat4 pMat, mMat, mvMat;
 GLuint mvLoc, projLoc;
-float cameraX, cameraY, cameraZ;
 float cubeLocX, cubeLocY, cubeLocZ;
 
-void setupVertices(void) { // 36 vertices, 12 triangles, makes 2x2x2 cube placed at origin
+void setupVertices(const ShaderProgram& shaderProgram) { // 36 vertices, 12 triangles, makes 2x2x2 cube placed at origin
     float vertexPositions[108] = {
         -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f,
         1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f,
@@ -61,7 +63,7 @@ void setupVertices(void) { // 36 vertices, 12 triangles, makes 2x2x2 cube placed
     // glGenVertexArraysOES(1, vao);
     // glBindVertexArrayOES(vao[0]);
     // glGenBuffers(numVBOs, vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, *(shaderProgram.getVbo()));
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
 }
 
@@ -75,78 +77,45 @@ int main()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-    ShaderProgram shaderProgram2(vertexSource, fragmentSource, 1);
+    ShaderProgram shaderProgram(vertexSource, fragmentSource, 1);
+    shaderProgram.init();
+    GLuint shaderProgramId = shaderProgram.getShaderProgram();
 
-    // Create a Vertex Buffer Object and copy the vertex data to it
-    setupVertices();
+    Camera camera(0.0f, 0.0f, 8.0f);
 
-    glGenBuffers(1, &vbo);
-    // GLfloat vertices[] = {0.25f, -0.25f, 0.0f, -0.25f, -0.25f, 0.0f, 0.25f, 0.25f, 0.0f};
+    setupVertices(shaderProgram);
+    // Cube cube;
+    // Renderer renderer(&shaderProgram);
 
-    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // Create and compile the vertex shader
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexSource, nullptr);
-    glCompileShader(vertexShader);
-
-    // Create and compile the fragment shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentSource, nullptr);
-    glCompileShader(fragmentShader);
-
-    // Link the vertex and fragment shader into a shader program
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    glUseProgram(shaderProgram);
+    // renderer.render(&cube);
 
     // Specify the layout of the vertex data
-    GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+    GLint posAttrib = glGetAttribLocation(shaderProgramId, "position");
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-    // projLoc = glGetUniformLocation(shaderProgram, "proj_matrix");
-    // build perspective matrix
-     // 1.0472 radians = 60 degrees
-    // build view matrix, model matrix, and model-view matrix
-cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
-cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 0.0f; // shift down Y to reveal perspective
+    cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 0.0f; // shift down Y to reveal perspective
     mMat = glm::mat4(1.0f); //glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
-    mvMat = mMat;//vMat * mMat;
-    // glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
-    // glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
 
     loop = [&]
     {
         glClear(GL_DEPTH_BUFFER_BIT);
-        glUseProgram(shaderProgram);
+        glUseProgram(shaderProgramId);
 
-        mvLoc = glGetUniformLocation(shaderProgram, "mv_matrix");
-        projLoc = glGetUniformLocation(shaderProgram, "proj_matrix");
+        mvLoc = glGetUniformLocation(shaderProgramId, "mv_matrix");
+        projLoc = glGetUniformLocation(shaderProgramId, "proj_matrix");
         mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
         pMat = glm::perspective(1.0472f, 1.0f, 0.1f, 1000.0f);
-        vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
-        mvMat = vMat * mMat;
+        mvMat = camera.getViewMatrix() * mMat;
         glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
-        // move a vertex
-        // const uint32_t milliseconds_since_start = SDL_GetTicks();
-        // const uint32_t milliseconds_per_loop = 3000;
-        // // vertices[0] = ( milliseconds_since_start % milliseconds_per_loop ) / float(milliseconds_per_loop) - 0.5f;
-        // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-        // Clear the screen
         if( background_is_black )
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         else
             glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Draw a triangle from the 3 vertices
-        // glDrawArrays(GL_TRIANGLES, 0, 3);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
         glDrawArrays(GL_TRIANGLES, 0, 36);

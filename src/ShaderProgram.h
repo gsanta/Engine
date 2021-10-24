@@ -13,6 +13,9 @@ public:
     GLuint getShaderProgram() {
         return shaderProgram;
     }
+    GLuint* getVbo() const {
+        return vbo;
+    }
 
 private:
     GLuint shaderProgram;

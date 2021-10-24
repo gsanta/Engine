@@ -5,7 +5,8 @@
             "includePath": [
                 "${default}",
                 "C:\\apps\\emsdk\\upstream\\emscripten\\cache\\sysroot\\include\\**",
-                "includes\\**"
+                "includes\\**",
+                "C:\\apps\\opengl\\include\\**"
             ],
             "windowsSdkVersion": "10.0.16299.0",
             "compilerPath": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30037\\bin\\Hostx64\\x64\\cl.exe",
