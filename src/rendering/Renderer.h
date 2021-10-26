@@ -7,11 +7,11 @@
 class Renderer {
 
 public:
-    Renderer(ShaderProgram* program);
+    Renderer(ShaderProgram& program);
     void render(Shape* shape);
 
 private:
-    ShaderProgram* program;
+    ShaderProgram& program;
 };
 
 #endif

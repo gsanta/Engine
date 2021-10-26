@@ -44,29 +44,6 @@ glm::mat4 pMat, mMat, mvMat;
 GLuint mvLoc, projLoc;
 float cubeLocX, cubeLocY, cubeLocZ;
 
-void setupVertices(const ShaderProgram& shaderProgram) { // 36 vertices, 12 triangles, makes 2x2x2 cube placed at origin
-    float vertexPositions[108] = {
-        -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f,
-        1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f,
-        1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-        -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-        -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f,
-        -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f,
-        -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,
-        -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f
-    };
-
-    // glGenVertexArraysOES(1, vao);
-    // glBindVertexArrayOES(vao[0]);
-    // glGenBuffers(numVBOs, vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, *(shaderProgram.getVbo()));
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
-}
-
 int main()
 {
     SDL_Window *window;
@@ -83,11 +60,12 @@ int main()
 
     Camera camera(0.0f, 0.0f, 8.0f);
 
-    setupVertices(shaderProgram);
-    // Cube cube;
-    // Renderer renderer(&shaderProgram);
+    // setupVertices(shaderProgram, vertexPositions, 108 * sizeof(float));
+    Cube cube;
+    Renderer renderer(shaderProgram);
 
-    // renderer.render(&cube);
+    renderer.render(&cube);
+    // renderer.render(vertexPositions);
 
     // Specify the layout of the vertex data
     GLint posAttrib = glGetAttribLocation(shaderProgramId, "position");
