@@ -12,6 +12,7 @@
 #include "src/Camera.h"
 #include "src/shapes/Cube.h"
 #include "src/rendering/Renderer.h"
+#include "src/rendering/Perspective.h"
 
 // Shader sources
 const GLchar* vertexSource =
@@ -71,6 +72,14 @@ int main()
 
     mMat = glm::mat4(1.0f); //glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
 
+    PerspectiveOptions perspectiveOptions;
+    perspectiveOptions.fieldOfView = 1.0472f; 
+    perspectiveOptions.aspect = 1.0f; 
+    perspectiveOptions.zNear = 0.1f; 
+    perspectiveOptions.zFar = 1000.0f; 
+
+    Perspective perspective(perspectiveOptions);
+
     loop = [&]
     {
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -79,7 +88,8 @@ int main()
         mvLoc = glGetUniformLocation(shaderProgramId, "mv_matrix");
         projLoc = glGetUniformLocation(shaderProgramId, "proj_matrix");
         mMat = cube.getTransform();
-        pMat = glm::perspective(1.0472f, 1.0f, 0.1f, 1000.0f);
+        // pMat = glm::perspective(1.0472f, 1.0f, 0.1f, 1000.0f);
+        pMat = perspective.getProjectionMatrix();
         mvMat = camera.getViewMatrix() * mMat;
         glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
