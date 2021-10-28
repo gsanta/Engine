@@ -42,7 +42,6 @@ void main_loop() { loop(); }
 GLuint vbo;
 glm::mat4 pMat, mMat, mvMat;
 GLuint mvLoc, projLoc;
-float cubeLocX, cubeLocY, cubeLocZ;
 
 int main()
 {
@@ -60,19 +59,16 @@ int main()
 
     Camera camera(0.0f, 0.0f, 8.0f);
 
-    // setupVertices(shaderProgram, vertexPositions, 108 * sizeof(float));
     Cube cube;
+    cube.translate(0.0f, -2.0f, 0.0f);
     Renderer renderer(shaderProgram);
 
     renderer.render(&cube);
-    // renderer.render(vertexPositions);
 
-    // Specify the layout of the vertex data
     GLint posAttrib = glGetAttribLocation(shaderProgramId, "position");
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-    cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 0.0f; // shift down Y to reveal perspective
     mMat = glm::mat4(1.0f); //glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
 
     loop = [&]
@@ -82,7 +78,7 @@ int main()
 
         mvLoc = glGetUniformLocation(shaderProgramId, "mv_matrix");
         projLoc = glGetUniformLocation(shaderProgramId, "proj_matrix");
-        mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
+        mMat = cube.getTransform();
         pMat = glm::perspective(1.0472f, 1.0f, 0.1f, 1000.0f);
         mvMat = camera.getViewMatrix() * mMat;
         glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
