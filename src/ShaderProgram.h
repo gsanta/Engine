@@ -2,6 +2,8 @@
 #define SHADERPROGRAM_H
 
 #include <SDL_opengles2.h>
+#include <vector>
+#include "./shapes/Shape.h"
 
 class ShaderProgram {
 
@@ -10,6 +12,8 @@ public:
     ~ShaderProgram();
 
     void init();
+    void addShape(Shape* shape);
+    void render();
     GLuint getShaderProgram() {
         return shaderProgram;
     }
@@ -22,6 +26,7 @@ private:
     GLuint* vbo;
     const GLchar* vertexSource;
     const GLchar* fragmentSource;
+    std::vector<Shape*> shapes;
 };
 
 #endif

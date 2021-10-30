@@ -4,14 +4,12 @@
 #include "../shapes/Shape.h"
 #include "../ShaderProgram.h"
 
+class ShaderProgram;
+
 class Renderer {
 
 public:
-    Renderer(ShaderProgram& program);
-    void render(Shape* shape);
-
-private:
-    ShaderProgram& program;
+    void render(ShaderProgram& program, Shape* shape);
 };
 
 #endif

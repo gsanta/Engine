@@ -54,17 +54,18 @@ int main()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
+    Renderer renderer;
     ShaderProgram shaderProgram(vertexSource, fragmentSource, 1);
     shaderProgram.init();
     GLuint shaderProgramId = shaderProgram.getShaderProgram();
 
     Camera camera(0.0f, 0.0f, 8.0f);
 
-    Cube cube;
-    cube.translate(0.0f, -2.0f, 0.0f);
-    Renderer renderer(shaderProgram);
+    Cube* cube = new Cube();
+    cube->translate(0.0f, -2.0f, 0.0f);
+    shaderProgram.addShape(cube);
 
-    renderer.render(&cube);
+    shaderProgram.render();
 
     GLint posAttrib = glGetAttribLocation(shaderProgramId, "position");
     glEnableVertexAttribArray(posAttrib);
@@ -87,7 +88,7 @@ int main()
 
         mvLoc = glGetUniformLocation(shaderProgramId, "mv_matrix");
         projLoc = glGetUniformLocation(shaderProgramId, "proj_matrix");
-        mMat = cube.getTransform();
+        mMat = cube->getTransform();
         // pMat = glm::perspective(1.0472f, 1.0f, 0.1f, 1000.0f);
         pMat = perspective.getProjectionMatrix();
         mvMat = camera.getViewMatrix() * mMat;
