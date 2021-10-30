@@ -1,6 +1,6 @@
 
-#ifndef CUBE_H
-#define CUBE_H
+#ifndef PYRAMID_H
+#define PYRAMID_H
 
 #include <iostream>
 #include <glm/glm.hpp>
@@ -28,7 +28,7 @@ public:
 
 private:
     float* vertices;
-    std::size_t size = sizeof(float) * 108;
+    std::size_t size = sizeof(float) * 54;
     glm::mat4 transform = glm::mat4(1.0f);
 };
 

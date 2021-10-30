@@ -11,6 +11,7 @@
 #include "src/ShaderProgram.h"
 #include "src/Camera.h"
 #include "src/shapes/Cube.h"
+#include "src/shapes/Pyramid.h"
 #include "src/rendering/Renderer.h"
 #include "src/rendering/Perspective.h"
 
@@ -56,16 +57,20 @@ int main()
 
     Renderer renderer;
     ShaderProgram shaderProgram(vertexSource, fragmentSource, 1);
-    shaderProgram.init();
-    GLuint shaderProgramId = shaderProgram.getShaderProgram();
 
     Camera camera(0.0f, 0.0f, 8.0f);
 
     Cube* cube = new Cube();
+    Cube* cube2 = new Cube();
+    // Pyramid* pyramid = new Pyramid();
     cube->translate(0.0f, -2.0f, 0.0f);
-    shaderProgram.addShape(cube);
+    cube2->translate(4.0f, 2.0f, 0.0f);
+    shaderProgram.addShape(cube2);
+    // shaderProgram.addShape(cube);
+    shaderProgram.init();
+    GLuint shaderProgramId = shaderProgram.getShaderProgram();
 
-    shaderProgram.render();
+    shaderProgram.initBuffers();
 
     GLint posAttrib = glGetAttribLocation(shaderProgramId, "position");
     glEnableVertexAttribArray(posAttrib);
@@ -95,10 +100,7 @@ int main()
         glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
 
-        if( background_is_black )
-            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        else
-            glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glEnable(GL_DEPTH_TEST);

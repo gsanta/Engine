@@ -13,6 +13,7 @@ public:
 
     void init();
     void addShape(Shape* shape);
+    void initBuffers();
     void render();
     GLuint getShaderProgram() {
         return shaderProgram;
@@ -23,7 +24,7 @@ public:
 
 private:
     GLuint shaderProgram;
-    GLuint* vbo;
+    GLuint* vbo = nullptr;
     const GLchar* vertexSource;
     const GLchar* fragmentSource;
     std::vector<Shape*> shapes;
