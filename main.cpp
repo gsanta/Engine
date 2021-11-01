@@ -14,6 +14,7 @@
 #include "src/shapes/Pyramid.h"
 #include "src/rendering/Renderer.h"
 #include "src/rendering/Perspective.h"
+#include "src/rendering/Proj.h"
 
 // Shader sources
 const GLchar* vertexSource =
@@ -45,6 +46,30 @@ GLuint vbo;
 glm::mat4 pMat, mMat, mvMat;
 GLuint mvLoc, projLoc;
 
+void test(int shaderProgramId, Cube* cube, Proj* perspective, Camera* camera) {
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glUseProgram(shaderProgramId);
+
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+    // for(std::vector<Shape*>::iterator it = std::begin(shapes); it != std::end(shapes); ++it) {
+        // Shape* shape = *it;
+    mvLoc = glGetUniformLocation(shaderProgramId, "mv_matrix");
+    projLoc = glGetUniformLocation(shaderProgramId, "proj_matrix");
+    std::cout << "projloc " << mvLoc << " mvloc: " << mvLoc << std::endl;
+    mMat = cube->getTransform();
+    // pMat = glm::perspective(1.0472f, 1.0f, 0.1f, 1000.0f);
+    pMat = perspective->getProjectionMatrix();
+    mvMat = camera->getViewMatrix() * mMat;
+
+    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+} 
+
 int main()
 {
     SDL_Window *window;
@@ -55,28 +80,8 @@ int main()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-    Renderer renderer;
-    ShaderProgram shaderProgram(vertexSource, fragmentSource, 1);
-
-    Camera camera(0.0f, 0.0f, 8.0f);
-
-    Cube* cube = new Cube();
-    Cube* cube2 = new Cube();
-    // Pyramid* pyramid = new Pyramid();
-    cube->translate(0.0f, -2.0f, 0.0f);
-    cube2->translate(4.0f, 2.0f, 0.0f);
-    shaderProgram.addShape(cube2);
-    // shaderProgram.addShape(cube);
-    shaderProgram.init();
-    GLuint shaderProgramId = shaderProgram.getShaderProgram();
-
-    shaderProgram.initBuffers();
-
-    GLint posAttrib = glGetAttribLocation(shaderProgramId, "position");
-    glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-    mMat = glm::mat4(1.0f); //glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
+    Renderer* renderer = new Renderer();
+    ShaderProgram* shaderProgram = new ShaderProgram(vertexSource, fragmentSource, 1);
 
     PerspectiveOptions perspectiveOptions;
     perspectiveOptions.fieldOfView = 1.0472f; 
@@ -84,28 +89,53 @@ int main()
     perspectiveOptions.zNear = 0.1f; 
     perspectiveOptions.zFar = 1000.0f; 
 
-    Perspective perspective(perspectiveOptions);
+    Perspective* perspective = new Perspective(perspectiveOptions);
+
+    shaderProgram->setProjection(perspective);
+
+    Camera* camera = new Camera(0.0f, 0.0f, 8.0f);
+    std::cout << camera->getX() << std::endl;
+    shaderProgram->setCamera(camera);
+
+    Cube* cube = new Cube();
+    Cube* cube2 = new Cube();
+    // Pyramid* pyramid = new Pyramid();
+    cube->translate(0.0f, -2.0f, 0.0f);
+    cube2->translate(4.0f, 2.0f, 0.0f);
+    // shaderProgram.addShape(cube2);
+    shaderProgram->addShape(cube);
+    shaderProgram->init();
+    GLuint shaderProgramId = shaderProgram->getShaderProgram();
+
+    shaderProgram->initBuffers();
+
+    GLint posAttrib = glGetAttribLocation(shaderProgramId, "position");
+    glEnableVertexAttribArray(posAttrib);
+    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    // mMat = glm::mat4(1.0f); //glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
 
     loop = [&]
     {
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glUseProgram(shaderProgramId);
 
-        mvLoc = glGetUniformLocation(shaderProgramId, "mv_matrix");
-        projLoc = glGetUniformLocation(shaderProgramId, "proj_matrix");
-        mMat = cube->getTransform();
-        // pMat = glm::perspective(1.0472f, 1.0f, 0.1f, 1000.0f);
-        pMat = perspective.getProjectionMatrix();
-        mvMat = camera.getViewMatrix() * mMat;
-        glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        // shaderProgram->render(cube);
+        shaderProgram->render(cube, perspective);
 
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LEQUAL);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        // test(shaderProgramId, cube, perspective, camera);
+
+        // mvLoc = glGetUniformLocation(shaderProgramId, "mv_matrix");
+        // projLoc = glGetUniformLocation(shaderProgramId, "proj_matrix");
+        // mMat = cube->getTransform();
+        // // pMat = glm::perspective(1.0472f, 1.0f, 0.1f, 1000.0f);
+        // pMat = perspective->getProjectionMatrix();
+        // mvMat = camera->getViewMatrix() * mMat;
+        // glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
+        // glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
+
+        // glEnable(GL_DEPTH_TEST);
+        // glDepthFunc(GL_LEQUAL);
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
         SDL_GL_SwapWindow(window);
@@ -115,3 +145,4 @@ int main()
 
     return EXIT_SUCCESS;
 }
+
