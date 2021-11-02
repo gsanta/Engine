@@ -8,7 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp> // glm::value_ptr
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-#include "src/ShaderProgram.h"
+#include "src/ShaderProgramImpl.h"
 #include "src/Camera.h"
 #include "src/shapes/Cube.h"
 #include "src/shapes/Pyramid.h"
@@ -46,30 +46,6 @@ GLuint vbo;
 glm::mat4 pMat, mMat, mvMat;
 GLuint mvLoc, projLoc;
 
-void test(int shaderProgramId, Cube* cube, Proj* perspective, Camera* camera) {
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glUseProgram(shaderProgramId);
-
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-    // for(std::vector<Shape*>::iterator it = std::begin(shapes); it != std::end(shapes); ++it) {
-        // Shape* shape = *it;
-    mvLoc = glGetUniformLocation(shaderProgramId, "mv_matrix");
-    projLoc = glGetUniformLocation(shaderProgramId, "proj_matrix");
-    std::cout << "projloc " << mvLoc << " mvloc: " << mvLoc << std::endl;
-    mMat = cube->getTransform();
-    // pMat = glm::perspective(1.0472f, 1.0f, 0.1f, 1000.0f);
-    pMat = perspective->getProjectionMatrix();
-    mvMat = camera->getViewMatrix() * mMat;
-
-    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-} 
-
 int main()
 {
     SDL_Window *window;
@@ -81,7 +57,7 @@ int main()
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
     Renderer* renderer = new Renderer();
-    ShaderProgram* shaderProgram = new ShaderProgram(vertexSource, fragmentSource, 1);
+    ShaderProgramImpl* shaderProgram = new ShaderProgramImpl(vertexSource, fragmentSource, 1);
 
     PerspectiveOptions perspectiveOptions;
     perspectiveOptions.fieldOfView = 1.0472f; 
@@ -99,11 +75,13 @@ int main()
 
     Cube* cube = new Cube();
     Cube* cube2 = new Cube();
-    // Pyramid* pyramid = new Pyramid();
+    Pyramid* pyramid = new Pyramid();
+    pyramid->translate(0.0f, -2.0f, 0.0f);
     cube->translate(0.0f, -2.0f, 0.0f);
     cube2->translate(4.0f, 2.0f, 0.0f);
-    // shaderProgram.addShape(cube2);
+    shaderProgram->addShape(cube2);
     shaderProgram->addShape(cube);
+    shaderProgram->addShape(pyramid);
     shaderProgram->init();
     GLuint shaderProgramId = shaderProgram->getShaderProgram();
 
@@ -117,10 +95,14 @@ int main()
 
     loop = [&]
     {
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glUseProgram(shaderProgramId);
 
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         // shaderProgram->render(cube);
-        shaderProgram->render(cube, perspective);
+        shaderProgram->render();
 
         // test(shaderProgramId, cube, perspective, camera);
 

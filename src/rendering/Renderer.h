@@ -2,14 +2,14 @@
 #define RENDERER_H
 
 #include "../shapes/Shape.h"
-#include "../ShaderProgram.h"
+#include "../ShaderProgramImpl.h"
 
-class ShaderProgram;
+class ShaderProgramImpl;
 
 class Renderer {
 
 public:
-    void render(ShaderProgram& program, Shape* shape);
+    void render(ShaderProgramImpl& program, Shape* shape);
 };
 
 #endif

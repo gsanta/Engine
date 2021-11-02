@@ -28,7 +28,7 @@ public:
 
 private:
     float* vertices;
-    std::size_t size = sizeof(float) * 108;
+    std::size_t size = 108;
     glm::mat4 transform = glm::mat4(1.0f);
 };
 

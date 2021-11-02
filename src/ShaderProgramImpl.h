@@ -1,24 +1,24 @@
-#ifndef SHADERPROGRAM_H
-#define SHADERPROGRAM_H
+#ifndef SHADERPROGRAMIMPL_H
+#define SHADERPROGRAMIMPL_H
 
 #include <SDL_opengles2.h>
 #include <vector>
 #include "./shapes/Shape.h"
-#include "./shapes/Cube.h"
 #include "./rendering/Proj.h"
 #include "./Camera.h"
+#include "./program/ShaderProgram.h"
 
-class ShaderProgram {
+class ShaderProgramImpl : ShaderProgram {
 
 public:
-    ShaderProgram(const GLchar* vertexSource, const GLchar* fragmentSource, int bufferCount);
-    ~ShaderProgram();
+    ShaderProgramImpl(const GLchar* vertexSource, const GLchar* fragmentSource, int bufferCount);
+    ~ShaderProgramImpl();
 
     void init();
     void addShape(Shape* shape);
     void initBuffers();
     // void render(Cube* shape);
-    void render(Cube* cube, Proj* perspective);
+    void render();
     void setProjection(Proj* proj);
     void setCamera(Camera* camera);
     GLuint getShaderProgram() {
