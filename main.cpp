@@ -78,9 +78,10 @@ int main()
     Pyramid* pyramid = new Pyramid();
     pyramid->setTranslate(-2.0f, 0.0f, 0.0f);
     cube->setTranslate(0.0f, -2.0f, 0.0f);
-    cube2->setTranslate(4.0f, 2.0f, 0.0f);
-    cube2->setScale(0.5f, 0.5f, 0.5f);
-    cube2->setRotate(0.8f, 0.0f, 0.0f, 1.0f);
+    cube2->setTranslate(1.0f, 0.0f, 0.0f);
+    cube2->setParent(cube);
+    // cube2->setScale(0.5f, 0.5f, 0.5f);
+    // cube2->setRotate(0.8f, 0.0f, 0.0f, 1.0f);
     shaderProgram->addShape(cube2);
     shaderProgram->addShape(cube);
     shaderProgram->addShape(pyramid);
@@ -103,24 +104,7 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // shaderProgram->render(cube);
         shaderProgram->render();
-
-        // test(shaderProgramId, cube, perspective, camera);
-
-        // mvLoc = glGetUniformLocation(shaderProgramId, "mv_matrix");
-        // projLoc = glGetUniformLocation(shaderProgramId, "proj_matrix");
-        // mMat = cube->getTransform();
-        // // pMat = glm::perspective(1.0472f, 1.0f, 0.1f, 1000.0f);
-        // pMat = perspective->getProjectionMatrix();
-        // mvMat = camera->getViewMatrix() * mMat;
-        // glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
-        // glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
-
-        // glEnable(GL_DEPTH_TEST);
-        // glDepthFunc(GL_LEQUAL);
-        // glDrawArrays(GL_TRIANGLES, 0, 36);
-
 
         SDL_GL_SwapWindow(window);
     };

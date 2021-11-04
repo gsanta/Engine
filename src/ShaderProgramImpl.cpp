@@ -35,7 +35,7 @@ void ShaderProgramImpl::render() {
         mvLoc = glGetUniformLocation(shaderProgram, "mv_matrix");
         projLoc = glGetUniformLocation(shaderProgram, "proj_matrix");
         pMat = projection->getProjectionMatrix();
-        mvMat = camera->getViewMatrix() * shape->getTransform();
+        mvMat = camera->getViewMatrix() * shape->getAbsoluteTransform();
 
         glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));

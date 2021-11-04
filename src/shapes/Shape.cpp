@@ -16,10 +16,35 @@ void Shape::setRotate(float axis, float x, float y, float z) {
     this->dirty = true;
 }
 
+void Shape::setParent(Shape* shape) {
+    this->parent = shape;
+}
+
 glm::mat4& Shape::getTransform() {
+    this->computeMatrices();
+
+    return this->transform;
+}
+
+glm::mat4& Shape::getAbsoluteTransform() {
+    this->computeMatrices();
+
+    return this->absoluteTransform;
+}
+
+void Shape::computeMatrices() {
     if (this->dirty) {
         this->transform = this->translate * this->rotate * this->scale;
     }
+    if (this->parent) {
+        this->absoluteTransform = this->parent->getAbsoluteTransform() * this->transform;
+    } else {
+        this->absoluteTransform = this->parent == nullptr ? this->transform : this->parent->getAbsoluteTransform() * this->transform;
+    }
 
-    return this->transform;
+    this->dirty = false;
+}
+
+Shape* Shape::getParent() {
+    return this->parent;
 }
