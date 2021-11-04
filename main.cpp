@@ -18,12 +18,12 @@
 
 // Shader sources
 const GLchar* vertexSource =
-    "attribute vec4 position;                     \n"
+    "attribute vec3 position;                     \n"
     "uniform mat4 mv_matrix;                      \n"
     "uniform mat4 proj_matrix;                    \n"
     "void main()                                  \n"
     "{                                            \n"
-    "  gl_Position = proj_matrix * mv_matrix * vec4(position.xyz, 1.0);     \n"
+    "  gl_Position = proj_matrix * mv_matrix * vec4(position, 1.0);     \n"
     "}                                            \n";
 
 const GLchar* fragmentSource =
@@ -76,9 +76,11 @@ int main()
     Cube* cube = new Cube();
     Cube* cube2 = new Cube();
     Pyramid* pyramid = new Pyramid();
-    pyramid->translate(0.0f, -2.0f, 0.0f);
-    cube->translate(0.0f, -2.0f, 0.0f);
-    cube2->translate(4.0f, 2.0f, 0.0f);
+    pyramid->setTranslate(-2.0f, 0.0f, 0.0f);
+    cube->setTranslate(0.0f, -2.0f, 0.0f);
+    cube2->setTranslate(4.0f, 2.0f, 0.0f);
+    cube2->setScale(0.5f, 0.5f, 0.5f);
+    cube2->setRotate(0.8f, 0.0f, 0.0f, 1.0f);
     shaderProgram->addShape(cube2);
     shaderProgram->addShape(cube);
     shaderProgram->addShape(pyramid);
@@ -89,7 +91,7 @@ int main()
 
     GLint posAttrib = glGetAttribLocation(shaderProgramId, "position");
     glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     // mMat = glm::mat4(1.0f); //glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
 

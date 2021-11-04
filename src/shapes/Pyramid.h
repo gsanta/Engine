@@ -19,13 +19,6 @@ public:
     virtual std::size_t getSize() const {
         return size;
     }
-
-    virtual glm::mat4& getTransform() {
-        return transform;
-    }
-
-    virtual void translate(float x, float y, float z);
-
 private:
     float* vertices;
     std::size_t size = 54;

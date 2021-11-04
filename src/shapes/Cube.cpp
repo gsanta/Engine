@@ -22,7 +22,3 @@ Cube::Cube() {
 Cube::~Cube() {
     delete[] vertices;
 }
-
-void Cube::translate(float x, float y, float z) {
-    this->transform = glm::translate(this->transform, glm::vec3(x, y, z));
-}

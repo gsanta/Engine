@@ -28,23 +28,28 @@ void ShaderProgramImpl::initBuffers() {
 }
 
 void ShaderProgramImpl::render() {
+    int counter = 0;
     for(std::vector<Shape*>::iterator it = std::begin(shapes); it != std::end(shapes); ++it) {
         Shape* shape = *it;
 
         mvLoc = glGetUniformLocation(shaderProgram, "mv_matrix");
         projLoc = glGetUniformLocation(shaderProgram, "proj_matrix");
-        mMat = shape->getTransform();
         pMat = projection->getProjectionMatrix();
-        mvMat = camera->getViewMatrix() * mMat;
+        mvMat = camera->getViewMatrix() * shape->getTransform();
 
         glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
 
         std::cout << "size: " << shape->getSize() / 3 << std::endl;
 
+        glBindBuffer(GL_ARRAY_BUFFER, *(getVbo() + counter));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(0);
+
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
         glDrawArrays(GL_TRIANGLES, 0, shape->getSize() / 3);
+        counter++;
     }
 } 
 

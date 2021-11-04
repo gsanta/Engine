@@ -1,5 +1,6 @@
 CC=emcc
 SOURCES=main.cpp src\ShaderProgramImpl.cpp src\Camera.cpp src\shapes\Cube.cpp src\rendering\Renderer.cpp
+SOURCES+=src\shapes\Shape.cpp
 SOURCES+=src\rendering\Proj.cpp
 SOURCES+=src\rendering\Perspective.cpp
 SOURCES+=src\shapes\Pyramid.cpp
